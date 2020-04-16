@@ -66,11 +66,14 @@ func main() {
 	<-end
 
 	chunk := num / 10
+	turn := 0
 	for i := 0; i < num; i += chunk {
+		turn++
 		go goroutine(i, chunk, end)
 	}
 
-	for i := 0; i < 10; i++ {
+	for turn > 0 {
+		turn--
 		<-end
 	}
 
