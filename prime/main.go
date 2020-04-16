@@ -65,7 +65,7 @@ func main() {
 	<-end
 	<-end
 
-	chunk := num / 6
+	chunk := num / 12
 	turn := 0
 	for i := 0; i < num; i += chunk {
 		turn++
