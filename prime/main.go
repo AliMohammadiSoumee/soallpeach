@@ -6,7 +6,7 @@ import (
 )
 
 var mark = make([]bool, 1000000)
-var ans = make([]uint32, 1500000)
+var ans = make([]byte, 3000000)
 var primes = make([]int, 78498)
 var lines = make([]int, 1500000)
 var num int = 0
@@ -74,36 +74,55 @@ func main() {
 		<-end
 	}
 
-	ans = ans[:num]
-	answer := join(ans)
-	os.Stdout.Write(answer)
+	ans = ans[:num*2]
+	os.Stdout.Write(ans)
 }
 func goroutine(start, chunk int, end chan string) {
 	e := chunk + start
+	j := start * 2
 	for ind := start; ind < e && ind < num; ind++ {
 		n := lines[ind]
-		isPrime(n, ind)
+		if n < 1000000 {
+			if mark[n] {
+				ans[j] = 48
+				ans[j+1] = 10
+			} else {
+				ans[j] = 49
+				ans[j+1] = 10
+			}
+		} else {
+			for _, p := range primes {
+				if p >= 46340 || p*p > n {
+					ans[j] = 49
+					ans[j+1] = 10
+				} else if n%p == 0 {
+					ans[j] = 48
+					ans[j+1] = 10
+				}
+			}
+		}
+		j += 2
 	}
 	end <- "e"
 }
 
-func isPrime(n, ind int) {
-	if n < 1000000 {
-		if mark[n] {
-			ans[ind] = 0
-		} else {
-			ans[ind] = 1
-		}
-	} else {
-		for _, p := range primes {
-			if p >= 46340 || p*p > n {
-				ans[ind] = 1
-			} else if n%p == 0 {
-				ans[ind] = 0
-			}
-		}
-	}
-}
+//func isPrime(n, ind int) {
+//	if n < 1000000 {
+//		if mark[n] {
+//			ans[ind] = 0
+//		} else {
+//			ans[ind] = 1
+//		}
+//	} else {
+//		for _, p := range primes {
+//			if p >= 46340 || p*p > n {
+//				ans[ind] = 1
+//			} else if n%p == 0 {
+//				ans[ind] = 0
+//			}
+//		}
+//	}
+//}
 
 func join(elems []uint32) []byte {
 	j := 0
