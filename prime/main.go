@@ -65,7 +65,7 @@ func main() {
 	<-end
 	<-end
 
-	chunk := num / 10
+	chunk := num / 6
 	turn := 0
 	for i := 0; i < num; i += chunk {
 		turn++
@@ -96,7 +96,7 @@ func goroutine(start, chunk int, end chan string) {
 			}
 		} else {
 			for _, p := range primes {
-				if p >= 46340 || p*p > n {
+				if p*p > n {
 					ans[j] = 49
 					ans[j+1] = 10
 				} else if n%p == 0 {
