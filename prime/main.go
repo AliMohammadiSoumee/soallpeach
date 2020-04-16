@@ -77,6 +77,7 @@ func main() {
 	ans = ans[:num*2]
 	os.Stdout.Write(ans)
 }
+
 func goroutine(start, chunk int, end chan string) {
 	e := chunk + start
 	j := start * 2
@@ -104,37 +105,4 @@ func goroutine(start, chunk int, end chan string) {
 		j += 2
 	}
 	end <- "e"
-}
-
-//func isPrime(n, ind int) {
-//	if n < 1000000 {
-//		if mark[n] {
-//			ans[ind] = 0
-//		} else {
-//			ans[ind] = 1
-//		}
-//	} else {
-//		for _, p := range primes {
-//			if p >= 46340 || p*p > n {
-//				ans[ind] = 1
-//			} else if n%p == 0 {
-//				ans[ind] = 0
-//			}
-//		}
-//	}
-//}
-
-func join(elems []uint32) []byte {
-	j := 0
-	bs := make([]byte, len(elems)*2)
-	for _, i := range elems {
-		if i == 0 {
-			bs[j] = 48
-		} else {
-			bs[j] = 49
-		}
-		bs[j+1] = 10
-		j += 2
-	}
-	return bs
 }
