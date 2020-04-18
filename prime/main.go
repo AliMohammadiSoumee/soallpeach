@@ -3,7 +3,6 @@ package main
 import (
 	"io/ioutil"
 	"os"
-	"time"
 )
 
 var mark = make([]bool, 1000000)
@@ -69,11 +68,9 @@ func main() {
 	go gharbal(end)
 	go whitespace(end)
 
-	t1 := time.Now()
 	<-end
 	<-end
 	<-end
-	t2 := time.Now()
 
 	ind := 0
 	for _, i := range lines {
@@ -90,8 +87,6 @@ func main() {
 	}
 	ans = ans[:num*2]
 	os.Stdout.Write(ans)
-
-	println(t2.Sub(t1))
 }
 
 func isPrime(n int) byte {
