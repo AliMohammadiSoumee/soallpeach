@@ -2,9 +2,7 @@ package main
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
-	"time"
 )
 
 const bigestPrime = 100000
@@ -34,11 +32,7 @@ func gharbal() {
 }
 
 func read(path string, end chan string) {
-	t1 := time.Now()
 	bytes, _ := ioutil.ReadFile(path)
-	t2 := time.Now()
-
-	log.Println("--->", t2.Sub(t1))
 
 	n := 0
 	for _, b := range bytes {
@@ -66,9 +60,7 @@ func read(path string, end chan string) {
 func main() {
 	path := os.Args[1]
 
-	t0 := time.Now()
 	gharbal()
-	t1 := time.Now()
 	end := make(chan string, 10)
 	go read(path, end)
 
@@ -76,14 +68,9 @@ func main() {
 		ans[i] = 10
 	}
 	<-end
-	t2 := time.Now()
 
 	ans = ans[:num]
 	os.Stdout.Write(ans)
-	t3 := time.Now()
-	log.Println(t1.Sub(t0))
-	log.Println(t2.Sub(t1))
-	log.Println(t3.Sub(t2))
 }
 
 func isPrime(n int) byte {
