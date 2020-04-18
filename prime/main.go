@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 var mark = make([]bool, 1000000)
@@ -34,13 +35,10 @@ func read(path string, end chan string) {
 		panic(err)
 	}
 
-	for i := range bytes {
-		bytes[i] -= 48
-	}
-
 	number := 0
 	l := 0
 	for _, b := range bytes {
+		b -= 48
 		if b == 218 {
 			lines[l] = number
 			number = 0
@@ -56,56 +54,53 @@ func read(path string, end chan string) {
 	end <- "e"
 }
 
+func whitespace(end chan string) {
+	for i := 1; i < 3000000; i += 2 {
+		ans[i] = 10
+	}
+	end <- "e"
+}
+
 func main() {
 	path := os.Args[1]
 
 	end := make(chan string, 10)
 	go read(path, end)
 	go gharbal(end)
+	go whitespace(end)
+
+	t1 := time.Now()
 	<-end
 	<-end
+	<-end
+	t2 := time.Now()
 
-	chunk := num / 8
-	turn := 0
-	for i := 0; i < num; i += chunk {
-		turn++
-		go goroutine(i, chunk, end)
-	}
-
-	for turn > 0 {
-		turn--
-		<-end
-	}
-
-	ans = ans[:num*2]
-	os.Stdout.Write(ans)
-}
-
-func goroutine(start, chunk int, end chan string) {
-	e := chunk + start
-	j := start * 2
-	for ind := start; ind < e && ind < num; ind++ {
-		n := lines[ind]
-		if n < 1000000 {
-			if mark[n] {
-				ans[j] = 48
-				ans[j+1] = 10
+	ind := 0
+	for _, i := range lines {
+		if i < 1000000 {
+			if mark[i] {
+				ans[ind] = 48
 			} else {
-				ans[j] = 49
-				ans[j+1] = 10
+				ans[ind] = 49
 			}
 		} else {
-			for _, p := range primes {
-				if p*p > n {
-					ans[j] = 49
-					ans[j+1] = 10
-				} else if n%p == 0 {
-					ans[j] = 48
-					ans[j+1] = 10
-				}
-			}
+			ans[ind] = isPrime(i)
 		}
-		j += 2
+		ind += 2
 	}
-	end <- "e"
+	ans = ans[:num*2]
+	os.Stdout.Write(ans)
+
+	println(t2.Sub(t1))
+}
+
+func isPrime(n int) byte {
+	for _, p := range primes {
+		if p*p > n {
+			return 49
+		} else if n%p == 0 {
+			return 48
+		}
+	}
+	return 49
 }
