@@ -14,17 +14,17 @@ var num int
 
 func gharbal() {
 	for i := 0; i < bigestPrime; i++ {
-		mark[i] = '0'
+		mark[i] = '1'
 	}
-	mark[0] = '1'
-	mark[1] = '1'
+	mark[0] = '0'
+	mark[1] = '0'
 	p := 0
 	for i := 2; i < bigestPrime; i++ {
-		if mark[i] == '1' {
+		if mark[i] == '0' {
 			continue
 		}
 		for j := i * 2; j < bigestPrime; j += i {
-			mark[j] = '1'
+			mark[j] = '0'
 		}
 		primes[p] = i
 		p++
@@ -54,6 +54,7 @@ func read(path string, end chan string) {
 	} else {
 		ans[num] = isPrime(n)
 	}
+	num+=2
 	end <- "e"
 }
 
