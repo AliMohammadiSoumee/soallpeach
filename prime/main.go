@@ -2,60 +2,63 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
+	"time"
 )
 
-var mark = make([]bool, 1000000)
-var ans = make([]byte, 3000000)
-var primes = make([]int, 78498)
-var lines = make([]int, 1500000)
-var num int = 0
+const bigestPrime = 100000
 
-func gharbal(end chan string) {
-	mark[0] = true
-	mark[1] = true
+var mark = make([]byte, bigestPrime)
+var ans = make([]byte, 3000000)
+var primes = make([]int, 10000)
+var num int
+
+func gharbal() {
+	for i := 0; i < bigestPrime; i++ {
+		mark[i] = '0'
+	}
+	mark[0] = '1'
+	mark[1] = '1'
 	p := 0
-	for i := 2; i < 1000000; i++ {
-		if mark[i] {
+	for i := 2; i < bigestPrime; i++ {
+		if mark[i] == '1' {
 			continue
 		}
-		for j := i * 2; j < 1000000; j += i {
-			mark[j] = true
+		for j := i * 2; j < bigestPrime; j += i {
+			mark[j] = '1'
 		}
 		primes[p] = i
 		p++
 	}
-	end <- "e"
 }
 
 func read(path string, end chan string) {
-	bytes, err := ioutil.ReadFile(path)
-	if err != nil {
-		panic(err)
-	}
+	t1 := time.Now()
+	bytes, _ := ioutil.ReadFile(path)
+	t2 := time.Now()
 
-	number := 0
-	l := 0
+	log.Println("--->", t2.Sub(t1))
+
+	n := 0
 	for _, b := range bytes {
-		b -= 48
-		if b == 218 {
-			lines[l] = number
-			number = 0
-			l++
+		if b != '\n' {
+			n = n*10 + int(b) - '0'
 			continue
 		}
-		number *= 10
-		number += int(b)
+		if n < bigestPrime {
+			ans[num] = mark[n]
+		} else {
+			ans[num] = isPrime(n)
+		}
+		n = 0
+		num += 2
 	}
-	lines[l] = number
-	l++
-	num = l
-	end <- "e"
-}
 
-func whitespace(end chan string) {
-	for i := 1; i < 3000000; i += 2 {
-		ans[i] = 10
+	if n < bigestPrime {
+		ans[num] = mark[n]
+	} else {
+		ans[num] = isPrime(n)
 	}
 	end <- "e"
 }
@@ -63,39 +66,33 @@ func whitespace(end chan string) {
 func main() {
 	path := os.Args[1]
 
+	t0 := time.Now()
+	gharbal()
+	t1 := time.Now()
 	end := make(chan string, 10)
 	go read(path, end)
-	go gharbal(end)
-	go whitespace(end)
 
-	<-end
-	<-end
-	<-end
-
-	ind := 0
-	for _, i := range lines {
-		if i < 1000000 {
-			if mark[i] {
-				ans[ind] = 48
-			} else {
-				ans[ind] = 49
-			}
-		} else {
-			ans[ind] = isPrime(i)
-		}
-		ind += 2
+	for i := 1; i < 3000000; i += 2 {
+		ans[i] = 10
 	}
-	ans = ans[:num*2]
+	<-end
+	t2 := time.Now()
+
+	ans = ans[:num]
 	os.Stdout.Write(ans)
+	t3 := time.Now()
+	log.Println(t1.Sub(t0))
+	log.Println(t2.Sub(t1))
+	log.Println(t3.Sub(t2))
 }
 
 func isPrime(n int) byte {
 	for _, p := range primes {
 		if p*p > n {
-			return 49
+			return '1'
 		} else if n%p == 0 {
-			return 48
+			return '0'
 		}
 	}
-	return 49
+	return '1'
 }
